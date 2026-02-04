@@ -1410,6 +1410,7 @@ document.getElementById('revision-volver').addEventListener('click', ()=>{
 }
   
 let REV_CUENTA=null;
+
 async function abrirRevisionCuenta(documento){
   try{
     const estado = (REVISION_MODE || 'ORDEN DE PAGO').trim();
@@ -1428,34 +1429,7 @@ async function abrirRevisionCuenta(documento){
     Swal.fire({icon:'error',title:'Error',text:e.message});
   }
 }
-
-async function abrirRevisionCuenta(documento){
-  try{
-    const estado = ESTADO_MAP[REVISION_MODE] || 'ORDEN DE PAGO';
-    const data=await apiGet('revisarCuentaData',{ documento, estado });
-
-    if(!data){
-      Swal.fire({icon:'info',title:'No encontrado'}); return;
-    }
-    REV_CUENTA=data;
-    resetSeccionesRevision();
-    renderRevisionCuenta();
-    showView('view-revisar-cuenta');
-  }catch(e){
-    Swal.fire({icon:'error',title:'Error',text:e.message});
-  }
-};
-    if(!data){
-      Swal.fire({icon:'info',title:'No encontrado'}); return;
-    }
-    REV_CUENTA=data;
-    resetSeccionesRevision();
-    renderRevisionCuenta();
-    showView('view-revisar-cuenta');
-  }catch(e){
-    Swal.fire({icon:'error',title:'Error',text:e.message});
-  }
-}
+  
 function renderRevisionCuenta(){
   const c=REV_CUENTA?.contratista;
   const cu=REV_CUENTA?.cuenta;
