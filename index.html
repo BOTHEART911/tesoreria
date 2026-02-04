@@ -622,6 +622,8 @@
         <h2 id="rc-title" style="color:var(--primary)">REVISIÓN DE CUENTA</h2>
         <div id="rc-body" class="narrow"></div>
 
+        <div id="rc-cuenta-bancaria" class="narrow" style="margin-top:10px;"></div>
+
         <div class="section-toggle">
           <button id="btn-toggle-contrato" class="chip">Ver Información del Contrato</button>
         </div>
@@ -1444,6 +1446,21 @@ function renderRevisionCuenta(){
   ];
   rcBody.innerHTML=baseInfo.map(x=>`<p>${x}</p>`).join('');
 
+  const cuentaBox = document.getElementById('rc-cuenta-bancaria');
+if (cuentaBox){
+  const nro = (c?.cuenta ?? '');
+  const tipo = (c?.tipoCuenta ?? '');
+  const banco = (c?.banco ?? '');
+
+  const linea = `CUENTA N°: ${nro} - ${tipo} ${banco}`.trim();
+
+  if (nro || tipo || banco){
+    cuentaBox.innerHTML = `<p><b>${linea}</b></p>`;
+  } else {
+    cuentaBox.innerHTML = '';
+  }
+}
+
   const sContrato=document.getElementById('sec-contrato');
   sContrato.innerHTML=[
     `<b>CONTRATO N°:</b> ${c?.contrato||''}`,
@@ -1623,8 +1640,8 @@ document.getElementById('rc-guardar').addEventListener('click', async ()=>{
   }
 
   if (REVISION_MODE === 'EGRESO'){
-    const fechaEgreso = (REV_CUENTA.cuenta.fechaEgreso || '').trim();
-    const egreso = (REV_CUENTA.cuenta.egreso || '').trim();
+    const fechaEgreso = String(REV_CUENTA?.cuenta?.fechaEgreso ?? '').trim();
+const egreso = String(REV_CUENTA?.cuenta?.egreso ?? '').trim();
 
     const rs = await Swal.fire({
       icon:'success',
