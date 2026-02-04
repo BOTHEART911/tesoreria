@@ -1412,11 +1412,22 @@ document.getElementById('revision-volver').addEventListener('click', ()=>{
 let REV_CUENTA=null;
 async function abrirRevisionCuenta(documento){
   try{
-    const ESTADO_MAP = {
-  'ORDEN DE PAGO': 'ORDEN DE PAGO',
-  'EGRESO': 'EGRESO',
-  'PAGADA': 'PAGADA'
-};
+    const estado = (REVISION_MODE || 'ORDEN DE PAGO').trim();
+    const res = await apiGet('revisarCuentaData', { documento, estado });
+
+    if(!res){
+      Swal.fire({icon:'info',title:'No encontrado'});
+      return;
+    }
+
+    REV_CUENTA = res;
+    resetSeccionesRevision();
+    renderRevisionCuenta();
+    showView('view-revisar-cuenta');
+  }catch(e){
+    Swal.fire({icon:'error',title:'Error',text:e.message});
+  }
+}
 
 async function abrirRevisionCuenta(documento){
   try{
