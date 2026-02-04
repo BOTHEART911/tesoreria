@@ -1327,8 +1327,8 @@ function pintarCuentas(list){
     pDoc.textContent='CC: '+(c.documento||'');
 
     const pInf=document.createElement('p');
-    pInf.className='item-sub';
-    pInf.textContent='INFORME: '+(c.informe||'')+' de: '+(c.totalInformes||'');
+pInf.className='item-sub';
+pInf.textContent='INFORME: ' + (c.informe||'') + ' de: ' + (c.totalInformes||'') + '   CONTRATO: ' + (c.contrato||'');
 
     const btnRow=document.createElement('div');
     btnRow.className='btn-row';
@@ -1361,6 +1361,17 @@ btnRevisar.addEventListener('click', ()=>{
     div.appendChild(header);
     div.appendChild(pDoc);
     div.appendChild(pInf);
+    if (REVISION_MODE === 'PAGADA'){
+  const pFecha = document.createElement('p');
+  pFecha.className = 'item-sub';
+  pFecha.textContent = 'FECHA DE EGRESO: ' + (c.fechaEgreso || '');
+  div.appendChild(pFecha);
+
+  const pEgreso = document.createElement('p');
+  pEgreso.className = 'item-sub';
+  pEgreso.textContent = 'N° DE EGRESO: ' + (c.egreso || '');
+  div.appendChild(pEgreso);
+}
     div.appendChild(btnRow);
     wrap.appendChild(div);
   }
@@ -1401,7 +1412,28 @@ document.getElementById('revision-volver').addEventListener('click', ()=>{
 let REV_CUENTA=null;
 async function abrirRevisionCuenta(documento){
   try{
-    const data=await apiGet('revisarCuentaData',{documento});
+    const ESTADO_MAP = {
+  'ORDEN DE PAGO': 'ORDEN DE PAGO',
+  'EGRESO': 'EGRESO',
+  'PAGADA': 'PAGADA'
+};
+
+async function abrirRevisionCuenta(documento){
+  try{
+    const estado = ESTADO_MAP[REVISION_MODE] || 'ORDEN DE PAGO';
+    const data=await apiGet('revisarCuentaData',{ documento, estado });
+
+    if(!data){
+      Swal.fire({icon:'info',title:'No encontrado'}); return;
+    }
+    REV_CUENTA=data;
+    resetSeccionesRevision();
+    renderRevisionCuenta();
+    showView('view-revisar-cuenta');
+  }catch(e){
+    Swal.fire({icon:'error',title:'Error',text:e.message});
+  }
+};
     if(!data){
       Swal.fire({icon:'info',title:'No encontrado'}); return;
     }
@@ -1528,8 +1560,12 @@ if (cu?.informe && c?.carpetaContratista){
   
 document.getElementById('rc-volver').addEventListener('click', ()=>{
   playSoundOnce(SOUNDS.back);
-  resetSeccionesRevision();     // cierra cualquier sección abierta
-  showView('view-revision');    // vuelve a la lista
+  resetSeccionesRevision();
+  if (REVISION_MODE === 'PAGADA'){
+    showView('view-inicio');
+  } else {
+    showView('view-revision');
+  }
 });
 
 
