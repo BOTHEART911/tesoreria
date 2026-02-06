@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>F
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
@@ -475,30 +475,6 @@
     flex: 1 1 100%;
   }
 }
-
-    .btn-badge-wrap{
-  position: relative;
-  display: inline-flex;
-  width: 100%;
-}
-.btn-badge{
-  position:absolute;
-  top:-10px;
-  right:-10px;
-  min-width:26px;
-  height:26px;
-  padding:0 8px;
-  border-radius:999px;
-  background:#dc2626;
-  color:#fff;
-  font-weight:900;
-  font-size:.85rem;
-  border:3px solid #fff;
-  box-shadow:0 4px 10px rgba(0,0,0,.18);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
 </style>
 </head>
 <body>
@@ -574,30 +550,15 @@
         <p id="inicio-fecha" class="center" style="font-weight:700; font-size:.95rem;"></p>
 
         <div class="btn-row spaced">
-  <button id="go-contratistas" class="btn-primary">CONTRATISTAS</button>
-
-  <button id="go-revision" class="btn-primary btn-badge-wrap">
-    EGRESOS PENDIENTES
-    <span id="egresos-pendientes-badge" class="btn-badge hidden"></span>
-  </button>
-
-  <button id="go-egresos-emitidos" class="btn-primary btn-badge-wrap">
-    EGRESOS EMITIDOS
-    <span id="egresos-emitidos-badge" class="btn-badge hidden"></span>
-  </button>
-
-  <button id="go-cuentas-pagadas" class="btn-primary">CUENTAS PAGADAS</button>
-          
-  <button id="go-solicitudes" class="btn-primary btn-badge-wrap">
-    SOLICITUDES
-    <span id="solicitudes-badge" class="btn-badge hidden"></span>
-  </button>
-
-  
-  <button id="go-requerimientos" class="btn-primary">REQUERIMIENTO</button>
-  <button id="go-comunicados" class="btn-primary">COMUNICADOS</button>
-  <button id="go-soporte" class="btn-primary">SOPORTE</button>
-</div>
+          <button id="go-contratistas" class="btn-primary">CONTRATISTAS</button>
+          <button id="go-revision" class="btn-primary">EGRESOS PENDIENTES</button>
+          <button id="go-egresos-emitidos" class="btn-primary">EGRESOS EMITIDOS</button>
+          <button id="go-cuentas-pagadas" class="btn-primary">CUENTAS PAGADAS</button>
+          <button id="go-solicitudes" class="btn-primary">SOLICITUDES</button>
+          <button id="go-requerimientos" class="btn-primary">REQUERIMIENTO</button>
+          <button id="go-comunicados" class="btn-primary">COMUNICADOS</button>
+          <button id="go-soporte" class="btn-primary">SOPORTE</button>
+        </div>
 
         <img class="banner-bottom" alt="Banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1766347982/banner_wbfbf7.gif" />
         <p class="center muted">Copyright © <b>GOBIERNO DIGITAL</b></p>
@@ -787,45 +748,6 @@
       </div>
     </section>
 
-     <!-- VISTA SOLICITUDES -->
-    <section id="view-solicitudes" class="view">
-  <div class="card">
-    <h2 style="color:var(--primary)">SOLICITUDES</h2>
-
-    <div class="center">
-      <div id="solicitudes-count" class="tag-count" style="display:none;"></div>
-      <p class="muted" style="margin:6px 0 12px;">N° de Solicitudes Pendientes</p>
-    </div>
-
-    <input id="solicitudes-filter" class="filter-input" type="text"
-      placeholder="Filtrar por secretaria, contrato o ID">
-
-    <div class="btn-row spaced">
-      <button id="solicitudes-volver" class="danger">REGRESAR</button>
-    </div>
-
-    <div id="solicitudes-list" class="list-grid"></div>
-  </div>
-</section>
-
-<section id="view-respuesta" class="view">
-  <div class="card narrow">
-    <h2 style="color:var(--primary)">RESPUESTA</h2>
-
-    <p style="margin:0 0 8px 0;"><b>INGRESA TU RESPUESTA</b></p>
-
-    <div id="respuesta-solicitud-box" class="section-content"></div>
-
-    <label>Respuesta</label>
-    <textarea id="respuesta" rows="5" placeholder="Responde al Contratista." required></textarea>
-
-    <div class="btn-row spaced">
-      <button id="respuesta-guardar" class="btn-primary">Guardar</button>
-      <button id="respuesta-volver" class="danger">Regresar</button>
-    </div>
-  </div>
-</section>
-   
     <!-- VISTA SOPORTE -->
     <section id="view-soporte" class="view">
       <div class="card narrow">
@@ -837,6 +759,44 @@
         </div>
       </div>
     </section>
+
+  <!-- VISTA SOLICITUDES -->
+<section id="view-solicitudes" class="view">
+  <div class="card">
+    <h2 style="color:var(--primary)">SOLICITUDES</h2>
+
+    <div class="center">
+      <div id="sol-count" class="tag-count" style="display:none;"></div>
+      <p class="muted" style="margin:6px 0 12px;">N° de Solicitudes Pendientes</p>
+    </div>
+
+    <input id="sol-filter" class="filter-input" type="text" placeholder="Filtrar por nombre, secretaria o contrato">
+
+    <div class="btn-row spaced">
+      <button id="sol-volver" class="danger">REGRESAR</button>
+    </div>
+
+    <div id="sol-list" class="list-grid"></div>
+  </div>
+</section>
+
+<!-- VISTA RESPUESTA -->
+<section id="view-respuesta" class="view">
+  <div class="card narrow">
+    <h2 style="color:var(--primary)">INGRESA TU RESPUESTA</h2>
+
+    <div class="narrow" id="resp-solicitud-box"></div>
+
+    <label>Respuesta:</label>
+    <textarea id="respuesta" rows="5" placeholder="Responde al Contratista." required></textarea>
+
+    <div class="btn-row spaced">
+      <button id="resp-guardar" class="btn-primary">Guardar</button>
+      <button id="resp-volver" class="danger">Regresar</button>
+    </div>
+  </div>
+</section>
+  
 
   </div>
 
@@ -963,44 +923,6 @@ function sendBuilderbotMessage(destino, mensaje){
   }).catch(err => console.warn('Error enviando BuilderBot', err));
 }
 
-  /* ================== CONTADOR EN BOTONES ================== */
-  function setButtonBadge(badgeId, n){
-  const el = document.getElementById(badgeId);
-  if(!el) return;
-  const num = Number(n || 0);
-  if(num > 0){
-    el.textContent = String(num);
-    el.classList.remove('hidden');
-  }else{
-    el.textContent = '';
-    el.classList.add('hidden');
-  }
-}
-
-// Refresca SOLO contadores (sin listar) para no ralentizar
-async function refrescarContadoresInicio(){
-  try{
-    const nPend = await apiGet('countCuentasPorEstado', { estado:'ORDEN DE PAGO' });
-    setButtonBadge('egresos-pendientes-badge', nPend);
-  }catch(_){
-    setButtonBadge('egresos-pendientes-badge', 0);
-  }
-
-  try{
-    const nEmit = await apiGet('countCuentasPorEstado', { estado:'EGRESO' });
-    setButtonBadge('egresos-emitidos-badge', nEmit);
-  }catch(_){
-    setButtonBadge('egresos-emitidos-badge', 0);
-  }
-
-  try{
-    const nSol = await apiGet('countSolicitudes', { estado:'PENDIENTE' });
-    setButtonBadge('solicitudes-badge', nSol);
-  }catch(_){
-    setButtonBadge('solicitudes-badge', 0);
-  }
-}
-
 /* ================== ESTADO GLOBAL ================== */
 let currentUser = null;
 
@@ -1087,9 +1009,8 @@ btnLogin.addEventListener('click', async () => {
       celular: res.celular || ''
     };
     playSoundOnce(SOUNDS.login);
-renderInicio();
-await refrescarContadoresInicio();
-showView('view-inicio');
+    renderInicio();
+    showView('view-inicio');
   } catch (e) {
     Swal.fire({ icon:'error', title:'Error', text:e.message });
   }
@@ -1505,11 +1426,10 @@ document.getElementById('cuentas-filter').addEventListener('input',()=>{
   pintarCuentas(filtered);
   actualizarResumenCuentas(filtered);
 });
-document.getElementById('revision-volver').addEventListener('click', async ()=>{
+document.getElementById('revision-volver').addEventListener('click', ()=>{
   playSoundOnce(SOUNDS.back);
   document.getElementById('revision-title').textContent = '';
   document.getElementById('revision-caption').textContent = '';
-  await refrescarContadoresInicio();
   showView('view-inicio');
 });
 
@@ -1981,31 +1901,65 @@ document.getElementById('soporte-volver').addEventListener('click', ()=>{
   showView('view-inicio');
 });
 
-  /* ================== SOLICITUDES (TESORERIA) ================== */
+  /* ================== SOLICITUDES ================== */
 let SOL_DATA = [];
-let SOL_CURRENT = null;
+let SOL_SELECTED = null;
+
+document.getElementById('go-solicitudes').addEventListener('click', async ()=>{
+  playSoundOnce(SOUNDS.login);
+  await cargarSolicitudes();
+  showView('view-solicitudes');
+});
+
+document.getElementById('sol-volver').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-inicio');
+});
+
+document.getElementById('sol-filter').addEventListener('input', ()=>{
+  const q = (document.getElementById('sol-filter').value || '').trim().toLowerCase();
+  const filtered = SOL_DATA.filter(s=>{
+    return [s.nombre, s.secretaria, s.contrato].some(v=>String(v||'').toLowerCase().includes(q));
+  });
+  pintarSolicitudes(filtered);
+  actualizarResumenSolicitudes(filtered);
+});
+
+async function cargarSolicitudes(){
+  try{
+    const list = await apiGet('listSolicitudesPendientes');
+    SOL_DATA = Array.isArray(list) ? list : [];
+    pintarSolicitudes(SOL_DATA);
+    actualizarResumenSolicitudes(SOL_DATA);
+
+    if (!SOL_DATA.length){
+      await Swal.fire({
+        icon:'success',
+        title:'Sin pendientes',
+        text:'No tienes SOLICITUDES pendientes',
+        timer: 2800,
+        showConfirmButton: false
+      });
+      showView('view-inicio');
+    }
+  }catch(e){
+    SOL_DATA = [];
+    pintarSolicitudes(SOL_DATA);
+    actualizarResumenSolicitudes(SOL_DATA);
+    Swal.fire({ icon:'error', title:'Error', text:e.message });
+  }
+}
 
 function actualizarResumenSolicitudes(list){
-  const box = document.getElementById('solicitudes-count');
+  const box = document.getElementById('sol-count');
   if(!box) return;
-  if(!list.length){
-    box.style.display='none';
-    box.textContent='';
-    return;
-  }
+  if(!list.length){ box.style.display='none'; box.textContent=''; return; }
   box.textContent = String(list.length);
   box.style.display='inline-block';
 }
 
-async function cargarSolicitudesPendientes(){
-  const list = await apiGet('listSolicitudes', { estado:'PENDIENTE' });
-  SOL_DATA = Array.isArray(list) ? list : [];
-  pintarSolicitudes(SOL_DATA);
-  actualizarResumenSolicitudes(SOL_DATA);
-}
-
 function pintarSolicitudes(list){
-  const wrap = document.getElementById('solicitudes-list');
+  const wrap = document.getElementById('sol-list');
   if(!wrap) return;
   wrap.innerHTML = '';
 
@@ -2018,139 +1972,123 @@ function pintarSolicitudes(list){
     const div = document.createElement('div');
     div.className = 'item-card';
 
-    const pEstado = document.createElement('p');
-    pEstado.className = 'item-title';
-    pEstado.innerHTML = '<b>' + (s.estado || '') + '</b>';
-    div.appendChild(pEstado);
+    const nombre = document.createElement('p');
+    nombre.className = 'item-title';
+    nombre.innerHTML = '<b>' + (s.nombre || '') + '</b>';
 
-    const pSec = document.createElement('p');
-    pSec.className = 'item-sub';
-    pSec.textContent = 'SECRETARIA: ' + (s.secretaria || '');
-    div.appendChild(pSec);
+    const sec = document.createElement('p');
+    sec.className = 'item-sub';
+    sec.textContent = 'SECRETARIA: ' + (s.secretaria || '');
 
-    const pCon = document.createElement('p');
-    pCon.className = 'item-sub';
-    pCon.textContent = 'CONTRATO: ' + (s.contrato || '');
-    div.appendChild(pCon);
+    const cont = document.createElement('p');
+    cont.className = 'item-sub';
+    cont.textContent = 'CONTRATO: ' + (s.contrato || '');
+
+    const hr = document.createElement('div');
+    hr.style.borderTop = '2px solid #ddd';
+    hr.style.margin = '8px 0';
 
     const btnRow = document.createElement('div');
     btnRow.className = 'btn-row';
 
-    const btnResponder = document.createElement('button');
-    btnResponder.textContent = 'RESPONDER';
-    btnResponder.className = 'btn-primary';
-    btnResponder.addEventListener('click', ()=>{
+    const btn = document.createElement('button');
+    btn.textContent = 'RESPONDER';
+    btn.addEventListener('click', ()=>{
       playSoundOnce(SOUNDS.login);
-      abrirVistaRespuesta(s);
+      SOL_SELECTED = s;
+      abrirRespuestaSolicitud();
     });
 
-    btnRow.appendChild(btnResponder);
+    btnRow.appendChild(btn);
+
+    div.appendChild(nombre);
+    div.appendChild(sec);
+    div.appendChild(cont);
+    div.appendChild(hr);
     div.appendChild(btnRow);
 
     wrap.appendChild(div);
   }
 }
 
-function abrirVistaRespuesta(s){
-  SOL_CURRENT = s;
-
-  const box = document.getElementById('respuesta-solicitud-box');
-  if(box){
-    const txt = (s?.solicitud || '').trim();
-    box.textContent = txt || '-';
-  }
-
+function abrirRespuestaSolicitud(){
+  const box = document.getElementById('resp-solicitud-box');
   const ta = document.getElementById('respuesta');
-  if(ta) ta.value = '';
+  if (ta) ta.value = '';
+
+  const solicitud = String(SOL_SELECTED?.solicitud || '').trim();
+  const nombre = String(SOL_SELECTED?.nombre || '').trim();
+
+  if (box){
+    box.innerHTML = [
+      `<p><b>Solicitud:</b></p>`,
+      `<p style="margin-top:6px;">${solicitud || '-'}</p>`,
+      `<p class="muted" style="margin-top:10px;"><b>Contratista:</b> ${nombre || '-'}</p>`
+    ].join('');
+  }
 
   showView('view-respuesta');
 }
 
-document.getElementById('go-solicitudes').addEventListener('click', async ()=>{
-  playSoundOnce(SOUNDS.login);
-  try{
-    await cargarSolicitudesPendientes();
-    showView('view-solicitudes');
-  }catch(e){
-    Swal.fire({icon:'error',title:'Error',text:e.message});
-  }
-});
-
-document.getElementById('solicitudes-volver').addEventListener('click', async ()=>{
+document.getElementById('resp-volver').addEventListener('click', ()=>{
   playSoundOnce(SOUNDS.back);
-  await refrescarContadoresInicio();
-  showView('view-inicio');
-});
-
-document.getElementById('solicitudes-filter').addEventListener('input', ()=>{
-  const q = (document.getElementById('solicitudes-filter').value || '').trim().toLowerCase();
-  const filtered = SOL_DATA.filter(s=>{
-    return [s.secretaria, s.contrato, s.idSolicitud]
-      .some(v=>String(v || '').toLowerCase().includes(q));
-  });
-  pintarSolicitudes(filtered);
-  actualizarResumenSolicitudes(filtered);
-});
-
-document.getElementById('respuesta-volver').addEventListener('click', ()=>{
-  playSoundOnce(SOUNDS.back);
+  SOL_SELECTED = null;
   showView('view-solicitudes');
 });
 
-document.getElementById('respuesta-guardar').addEventListener('click', async ()=>{
-  if(!SOL_CURRENT?.idSolicitud){
-    Swal.fire({icon:'warning',title:'Sin solicitud seleccionada'});
+document.getElementById('resp-guardar').addEventListener('click', async ()=>{
+  if(!SOL_SELECTED){
+    Swal.fire({ icon:'warning', title:'Sin solicitud seleccionada' });
     return;
   }
 
   const resp = (document.getElementById('respuesta')?.value || '').trim();
   if(!resp){
-    Swal.fire({icon:'warning',title:'Respuesta requerida',text:'Escribe la respuesta antes de guardar.'});
+    Swal.fire({ icon:'warning', title:'Respuesta requerida', text:'Escribe tu respuesta.' });
     return;
   }
+
+  const rowIndex = SOL_SELECTED.rowIndex;
+  const nombre = String(SOL_SELECTED.nombre || '').trim();
+  const solicitud = String(SOL_SELECTED.solicitud || '').trim();
+
+  const telefonoNormalizado = normalizeContratistaNumber(SOL_SELECTED.telefono);
 
   const rs = await Swal.fire({
     icon:'success',
     title:'¿Guardar respuesta?',
-    text:'Al guardar, el estado pasará a RESPONDIDA.',
+    text:'Esta solicitud pasará a RESPONDIDA',
     showCancelButton:true,
     confirmButtonText:'GUARDAR',
     cancelButtonText:'Cancelar'
   });
+
   if(!rs.isConfirmed) return;
 
   try{
-    await apiPost('guardarRespuestaSolicitud', {
-      idSolicitud: SOL_CURRENT.idSolicitud,
-      respuesta: resp
-    });
+    await apiPost('guardarRespuestaSolicitud', { rowIndex, respuesta: resp });
 
-    const nombre = String(SOL_CURRENT?.nombre || '').trim();
-const solicitudTxt = String(SOL_CURRENT?.solicitud || '').trim();
+    const mensaje =
+      'Estimado(a) *' + nombre + '*\n\n' +
+      'Atendiendo a tu solicitud: ' + solicitud + '\n\n' +
+      'Nos permitimos responder: ' + resp + '\n\n' +
+      'Muchas gracias por tu comprensión, ¡Excelente día!\n\n' +
+      'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes';
 
-const telRaw = SOL_CURRENT?.telefono;
-const tel = normalizeContratistaNumber(telRaw);
+    if (telefonoNormalizado){
+      sendBuilderbotMessage(telefonoNormalizado, mensaje);
+    } else {
+      Swal.fire({ icon:'warning', title:'Teléfono inválido', text:'Se guardó la respuesta, pero no se pudo enviar WhatsApp.' });
+    }
 
-const mensaje =
-  'Estimado(a) *' + nombre + '*\n\n' +
-  'Atendiendo a tu solicitud: ' + solicitudTxt + '\n\n' +
-  'Nos permitimos responder: ' + resp + '\n\n' +
-  'Muchas gracias por tu comprensión, ¡Excelente día!\n\n' +
-  'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes';
+    Swal.fire({ icon:'success', title:'Respuesta guardada', timer: 1800, showConfirmButton:false });
 
-if(tel){
-  sendBuilderbotMessage(tel, mensaje);
-} else {
-  Swal.fire({ icon:'warning', title:'Teléfono inválido', text:'La respuesta se guardó, pero no se pudo enviar WhatsApp.' });
-}
+    SOL_SELECTED = null;
 
-    Swal.fire({icon:'success',title:'Guardado',timer:1600,showConfirmButton:false});
-
-    await refrescarContadoresInicio();
-    await cargarSolicitudesPendientes();
+    await cargarSolicitudes();
     showView('view-solicitudes');
   }catch(e){
-    Swal.fire({icon:'error',title:'Error',text:e.message});
+    Swal.fire({ icon:'error', title:'Error', text:e.message });
   }
 });
 
