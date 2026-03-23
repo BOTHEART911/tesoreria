@@ -229,37 +229,37 @@
     pointer-events:none;
   }
 
-  /* === Carpeta arriba derecha como indexref.md === */
-  .item-header.orden-header{
-    display:flex !important;
-    align-items:flex-start !important;
-    justify-content:space-between !important;
-    gap:10px !important;
-    padding:0 !important;
-    margin:0 !important;
-    width:100% !important;
-  }
-  .item-header.orden-header .item-title{
-    flex:1 1 auto !important;
-    min-width:0 !important;
-    margin:0 !important;
-    padding-right:70px !important;
-    line-height:1.15 !important;
-  }
-  .orden-folder{
-    position:absolute !important;
-    top:14px !important;
-    right:16px !important;
-    padding:0 !important;
-    margin:0 !important;
-  }
-  .orden-folder img{
-    width:46px !important;
-    height:46px !important;
-    display:block !important;
-    object-fit:contain !important;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,.25)) !important;
-  }
+ /* === Carpeta en esquina superior derecha para TODAS las tarjetas/listados === */
+.item-card{
+  position:relative; /* necesario para ubicar el icono absoluto */
+}
+
+/* botón carpeta */
+.item-card .folder-corner{
+  position:absolute !important;
+  top:14px !important;
+  right:16px !important;
+  padding:0 !important;
+  margin:0 !important;
+  width:auto !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+/* imagen carpeta */
+.item-card .folder-corner img{
+  width:46px !important;
+  height:46px !important;
+  display:block !important;
+  object-fit:contain !important;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.25)) !important;
+}
+
+/* evita que el nombre quede por debajo del icono */
+.item-card .item-title{
+  padding-right:70px !important;
+}
 
   /* Input “orden/egreso” 6 dígitos (pill) */
   .op-input{
@@ -1057,7 +1057,7 @@ function pintarCuentas(list){
 
     // icono carpeta (BH idCuenta)
     const folderBtn=document.createElement('button');
-    folderBtn.className='btn-icon orden-folder';
+    folderBtn.className = 'btn-icon folder-corner';
     folderBtn.title='Abrir carpeta de CUENTA';
     folderBtn.setAttribute('aria-label','Abrir carpeta de CUENTA');
     folderBtn.innerHTML='<img src="https://res.cloudinary.com/dqqeavica/image/upload/v1764111247/carpeta_drive_epbrhp.webp" alt="CUENTA">';
