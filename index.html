@@ -360,6 +360,7 @@
           <button id="go-egresos-emitidos" class="btn-primary">EGRESOS EMITIDOS</button>
           <button id="go-cuentas-pagadas" class="btn-primary">CUENTAS PAGADAS</button>
           <button id="go-solicitudes" class="btn-primary">SOLICITUDES</button>
+          <button id="go-mis-informes" class="btn-primary">MIS INFORMES</button>
           <button id="go-comunicados" class="btn-primary">COMUNICADOS</button>
           <button id="go-soporte" class="btn-primary">SOPORTE</button>
         </div>
@@ -815,6 +816,59 @@ document.getElementById('go-cuentas-pagadas').addEventListener('click', async ()
     return;
   }
   showView('view-revision');
+});
+
+  /* ================== MIS INFORMES ================== */
+const INFORMES_LINKS = {
+  'DEYSI PATRICIA GONZALEZ GUERRA': 'https://docs.google.com/spreadsheets/d/1Fkc12KgVJAvu9zvwNtlg-KH876lizXV5Mde9FTSIV1Q/edit?usp=sharing',
+  'YISED ALBANI MARTINEZ BAUTISTA': 'https://docs.google.com/spreadsheets/d/15ysS1kpmfWO2_OjGMZnlMTmKG5ywwZJIkUyYZYZQvo4/edit?usp=sharing'
+};
+
+function openMisInformesFor(nombreProfesional){
+  const name = String(nombreProfesional || '').trim().toUpperCase();
+
+  if (INFORMES_LINKS[name]){
+    window.open(INFORMES_LINKS[name], '_blank');
+    return;
+  }
+
+  // Si es OSCAR POLANIA o LUZ HAYDEE ORTEGA MAYORGA: mostrar opciones
+  if (name === 'OSCAR POLANIA' || name === 'LUZ HAYDEE ORTEGA MAYORGA'){
+    // sonido de pregunta (como “opciones”)
+    playSoundOnce(SOUNDS.question);
+
+    Swal.fire({
+      icon: 'info',
+      title: 'MIS INFORMES',
+      text: 'Selecciona el usuario:',
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: 'DEYSI PATRICIA GONZALEZ GUERRA',
+      denyButtonText: 'YISED ALBANI MARTINEZ BAUTISTA',
+      cancelButtonText: 'CERRAR'
+    }).then((rs)=>{
+      if (rs.isConfirmed){
+        playSoundOnce(SOUNDS.login);
+        window.open(INFORMES_LINKS['DEYSI PATRICIA GONZALEZ GUERRA'], '_blank');
+      } else if (rs.isDenied){
+        playSoundOnce(SOUNDS.login);
+        window.open(INFORMES_LINKS['YISED ALBANI MARTINEZ BAUTISTA'], '_blank');
+      } else {
+        // cerrar: no hacemos nada (SweetAlert ya reproduce el sonido según icon si lo pones)
+        playSoundOnce(SOUNDS.back);
+      }
+    });
+
+    return;
+  }
+
+  // Otros usuarios
+  Swal.fire({ icon:'warning', title:'Sin acceso', text:'No tienes MIS INFORMES asignados.' });
+}
+
+document.getElementById('go-mis-informes').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.login);
+  openMisInformesFor(currentUser?.profesional || '');
 });
 
 document.getElementById('go-comunicados').addEventListener('click', ()=>{
