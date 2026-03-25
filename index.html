@@ -1163,6 +1163,10 @@ function pintarCuentas(list){
       pOrden2.className='item-sub';
       pOrden2.textContent='N° DE ORDEN: '+(c.orden||'');
 
+      const pFechaOrden=document.createElement('p');
+      pFechaOrden.className='item-sub';
+      pFechaOrden.textContent='FECHA DE ORDEN: '+(c.fechaOrden||'');
+
       div.appendChild(pFactura);
       div.appendChild(pSup);
       div.appendChild(pOrden2);
