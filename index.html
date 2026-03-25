@@ -1245,7 +1245,9 @@ function pintarCuentas(list){
             responsable: currentUser?.profesional || '',
             cuentaText: (String(c.informe||'') + ' de ' + String(c.totalInformes||'')).trim(),
             contrato: c.contrato || '',
-            nombre: c.nombre || ''
+            nombre: c.nombre || '',
+            orden: c.orden || '',
+            fechaOrden: c.fechaOrden || ''
           });
 
           Swal.fire({icon:'success',title:'Egreso guardado',timer:1800,showConfirmButton:false});
