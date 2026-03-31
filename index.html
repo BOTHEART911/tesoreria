@@ -1435,7 +1435,24 @@ function pintarCuentas(list){
       btnGuardar.addEventListener('click', async ()=>{
         playSoundOnce(SOUNDS.login);
 
-                const pagoNum2 = parseCOPNumber(inpPago2.value);
+        const pagoNum = parseCOPNumber(inpPago.value);
+        if(!pagoNum || pagoNum<=0){
+          Swal.fire({icon:'warning',title:'VALOR PAGADO requerido',text:'Ingresa un valor válido en pesos colombianos.'});
+          return;
+        }
+        const destinacion = String(selDest.value||'').trim();
+        if(!destinacion){
+          Swal.fire({icon:'warning',title:'FUENTE DE DESTINACIÓN requerida',text:'Selecciona una opción.'});
+          return;
+        }
+        const banco = String(inpBanco.value||'').trim();
+        const numCuenta = String(inpNum.value||'').trim();
+        if(!banco || !numCuenta){
+          Swal.fire({icon:'warning',title:'Destino inválido',text:'Selecciona una destinación válida.'});
+          return;
+        }
+
+        const pagoNum2 = parseCOPNumber(inpPago2.value);
         const destinacion2 = String(selDest2.value||'').trim();
         const banco2 = String(inpBanco2.value||'').trim();
         const numCuenta2 = String(inpNum2.value||'').trim();
