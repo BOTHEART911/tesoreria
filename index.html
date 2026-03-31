@@ -663,16 +663,16 @@ function formatCOPFrontend(n){
   const s = String(Math.round(num)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
   return '$ ' + s;
 }
-function formatPagoDetallesDS_(dsText){
-  // Espera: "PAGO DE 4200000, ..."
-  // Debe renderizar: "PAGO DE $ 4.200.000, ..."
-  const t = String(dsText||'').trim();
+function formatPagoDetallesDS_(text){
+  const t = String(text||'').trim();
   if(!t) return '';
-  const m = t.match(/PAGO\s+DE\s+(\d+)/i);
-  if(!m) return t;
-  const val = Number(m[1]);
-  if(!isFinite(val)) return t;
-  return t.replace(m[1], formatCOPFrontend(val).replace('$ ','').replace(/\./g,'').length ? formatCOPFrontend(val) : m[1]);
+
+  // Reemplaza cada "PAGO DE 12345" por "PAGO DE $ 12.345"
+  return t.replace(/PAGO\s+DE\s+(\d+)/gi, (_, numStr)=>{
+    const n = Number(numStr);
+    if(!isFinite(n)) return 'PAGO DE ' + numStr;
+    return 'PAGO DE ' + formatCOPFrontend(n);
+  });
 }
 
 /* ================== LOGIN ================== */
@@ -1189,7 +1189,7 @@ function pintarCuentas(list){
       });
 
       const labelEgreso=document.createElement('label');
-      labelEgreso.textContent='NÚMERO DE EGRESO (6 Dígitos)';
+      labelEgreso.textContent='NÚMERO DE EGRESO 1:';
       const inpEgreso=document.createElement('input');
       inpEgreso.className='op-input';
       inpEgreso.type='text';
@@ -1207,6 +1207,28 @@ function pintarCuentas(list){
         inpEgreso.value=v;
         c.egreso6=v;
       });
+
+      const labelEgreso2=document.createElement('label');
+      labelEgreso2.textContent='NÚMERO DE EGRESO 2:';
+      const inpEgreso2=document.createElement('input');
+      inpEgreso2.id='egreso2';
+      inpEgreso2.className='op-input';
+      inpEgreso2.type='text';
+      inpEgreso2.inputMode='numeric';
+      inpEgreso2.autocomplete='off';
+      inpEgreso2.placeholder='(Opcional) 000124';
+      inpEgreso2.maxLength=6;
+
+      const eg2Full = String(c.egreso2||'').trim();
+      const eg2_6 = eg2Full.startsWith('2026') ? eg2Full.slice(4) : eg2Full;
+      inpEgreso2.value = eg2_6;
+
+      inpEgreso2.addEventListener('input', ()=>{
+        let v=String(inpEgreso2.value||'').replace(/\D/g,'').slice(0,6);
+        inpEgreso2.value=v;
+        c.egreso2_6=v;
+      });
+
 
       // botón guardar
       const btnRow=document.createElement('div');
@@ -1230,6 +1252,13 @@ function pintarCuentas(list){
 
         const egresoFull = '2026' + egreso6;
 
+        const egreso2_6 = String(inpEgreso2.value||'').trim();
+        if(egreso2_6 && !/^\d{6}$/.test(egreso2_6)){
+          Swal.fire({icon:'warning',title:'N° de Egreso 2 inválido',text:'Debe tener 6 dígitos (ej: 000124) o quedar vacío'}); 
+          return;
+        }
+        const egreso2Full = egreso2_6 ? ('2026' + egreso2_6) : '';
+
         const rs = await Swal.fire({
           icon:'success',
           title:`Cuenta N° ${c.informe} de ${c.nombre}`,
@@ -1246,6 +1275,7 @@ function pintarCuentas(list){
             informe: c.informe,
             fechaEgreso,
             egreso: egresoFull,
+            egreso2: egreso2Full,
             responsable: currentUser?.profesional || '',
             cuentaText: (String(c.informe||'') + ' de ' + String(c.totalInformes||'')).trim(),
             contrato: c.contrato || '',
@@ -1268,6 +1298,8 @@ function pintarCuentas(list){
       div.appendChild(inpFecha);
       div.appendChild(labelEgreso);
       div.appendChild(inpEgreso);
+      div.appendChild(labelEgreso2);
+      div.appendChild(inpEgreso2);
       div.appendChild(btnRow);
     }
 
@@ -1279,11 +1311,17 @@ function pintarCuentas(list){
 
       const pEgreso=document.createElement('p');
       pEgreso.className='item-sub';
-      pEgreso.textContent='NÚMERO DE EGRESO: '+(c.egreso||'');
+      pEgreso.textContent='NÚMERO DE EGRESO 1: '+(c.egreso||'');
+
+      const pEgreso2=document.createElement('p');
+      pEgreso2.className='item-sub';
+      const eg2 = String(c.egreso2||'').trim();
+      pEgreso2.textContent='NÚMERO DE EGRESO 2: ' + (eg2 ? eg2 : 'N/A');
 
       div.appendChild(pOrden);
       div.appendChild(pFecha);
       div.appendChild(pEgreso);
+      div.appendChild(pEgreso2);
 
       // campos a diligenciar
       const labelPago=document.createElement('label');
@@ -1337,6 +1375,57 @@ function pintarCuentas(list){
         inpNum.value = found ? found.numCuenta : '';
       });
 
+            const labelPago2=document.createElement('label');
+      labelPago2.textContent='VALOR PAGADO 2:';
+      const inpPago2=document.createElement('input');
+      inpPago2.id='pago2';
+      inpPago2.className='cop-input';
+      inpPago2.type='text';
+      inpPago2.inputMode='numeric';
+      inpPago2.placeholder='(Opcional) $ 0';
+
+      inpPago2.addEventListener('input', ()=>{
+        let digits = String(inpPago2.value||'').replace(/\D/g,'');
+        if(digits.length>12) digits = digits.slice(0,12);
+        const n = digits ? Number(digits) : 0;
+        inpPago2.value = digits ? formatCOPFrontend(n) : '';
+      });
+
+      const labelDest2=document.createElement('label');
+      labelDest2.textContent='FUENTE DE DESTINACIÓN 2:';
+      const selDest2=document.createElement('select');
+      selDest2.id='destinacion2';
+      const opt02=document.createElement('option');
+      opt02.value='';
+      opt02.textContent='Selecciona (opcional)';
+      opt02.selected=true;
+      selDest2.appendChild(opt02);
+      for(const d of DESTINACIONES){
+        const o=document.createElement('option');
+        o.value=d.name;
+        o.textContent=d.name;
+        selDest2.appendChild(o);
+      }
+
+      const labelBanco2=document.createElement('label');
+      labelBanco2.textContent='BANCO 2:';
+      const inpBanco2=document.createElement('input');
+      inpBanco2.id='banco2';
+      inpBanco2.readOnly=true;
+
+      const labelNum2=document.createElement('label');
+      labelNum2.textContent='N° DE CUENTA 2:';
+      const inpNum2=document.createElement('input');
+      inpNum2.id='numCuenta2';
+      inpNum2.readOnly=true;
+
+      selDest2.addEventListener('change', ()=>{
+        const name=String(selDest2.value||'').trim();
+        const found = DESTINACIONES.find(x=>x.name===name);
+        inpBanco2.value = found ? found.banco : '';
+        inpNum2.value = found ? found.numCuenta : '';
+      });
+
       const btnRow=document.createElement('div');
       btnRow.className='btn-row';
 
@@ -1346,26 +1435,36 @@ function pintarCuentas(list){
       btnGuardar.addEventListener('click', async ()=>{
         playSoundOnce(SOUNDS.login);
 
-        const pagoNum = parseCOPNumber(inpPago.value);
-        if(!pagoNum || pagoNum<=0){
-          Swal.fire({icon:'warning',title:'VALOR PAGADO requerido',text:'Ingresa un valor válido en pesos colombianos.'});
-          return;
-        }
-        const destinacion = String(selDest.value||'').trim();
-        if(!destinacion){
-          Swal.fire({icon:'warning',title:'FUENTE DE DESTINACIÓN requerida',text:'Selecciona una opción.'});
-          return;
-        }
-        const banco = String(inpBanco.value||'').trim();
-        const numCuenta = String(inpNum.value||'').trim();
-        if(!banco || !numCuenta){
-          Swal.fire({icon:'warning',title:'Destino inválido',text:'Selecciona una destinación válida.'});
-          return;
+                const pagoNum2 = parseCOPNumber(inpPago2.value);
+        const destinacion2 = String(selDest2.value||'').trim();
+        const banco2 = String(inpBanco2.value||'').trim();
+        const numCuenta2 = String(inpNum2.value||'').trim();
+
+        const hasPago2 = pagoNum2 && pagoNum2 > 0;
+        const hasAny2 = hasPago2 || !!destinacion2 || !!banco2 || !!numCuenta2;
+
+        if (hasAny2){
+          if (!hasPago2){
+            Swal.fire({icon:'warning',title:'VALOR PAGADO 2 inválido',text:'Si vas a diligenciar el bloque 2, ingresa un valor válido.'});
+            return;
+          }
+          if (!destinacion2){
+            Swal.fire({icon:'warning',title:'FUENTE DE DESTINACIÓN 2 requerida',text:'Selecciona una opción o deja todo el bloque 2 vacío.'});
+            return;
+          }
+          if (!banco2 || !numCuenta2){
+            Swal.fire({icon:'warning',title:'Destino 2 inválido',text:'Selecciona una destinación válida en el bloque 2.'});
+            return;
+          }
         }
 
         const fecha = fechaDMY(new Date());
-        const detallePago = `PAGO DE ${pagoNum}, ${destinacion}, N° CUENTA ${numCuenta} BANCO ${banco} EL DIA ${fecha}`;
 
+        let detallePago = `PAGO DE ${pagoNum} - ${destinacion} - N° CUENTA ${numCuenta} BANCO ${banco}`;
+        if (hasAny2){
+          detallePago += ` Y PAGO DE ${pagoNum2} - ${destinacion2} - N° CUENTA ${numCuenta2} BANCO ${banco2}`;
+        }
+        detallePago += ` EL DIA ${fecha}`;
         const rs = await Swal.fire({
           icon:'success',
           title:`Egreso N° ${c.egreso} de ${c.nombre}`,
@@ -1390,16 +1489,31 @@ function pintarCuentas(list){
             nombre: c.nombre || '',
             egreso: c.egreso || '',
             fechaEgreso: c.fechaEgreso || '',
+            egreso2: c.egreso2 || '',
+            pago2: (hasAny2 ? pagoNum2 : ''),
+            destinacion2: (hasAny2 ? destinacion2 : ''),
+            banco2: (hasAny2 ? banco2 : ''),
+            numCuenta2: (hasAny2 ? numCuenta2 : ''),
             detallePago
           });
 
           // WhatsApp contratista (mensaje igual que ya estaba en tu index anterior)
           const telContratista = normalizeContratistaNumber(c.telefono||'');
-          function msgPagadaContratista(){
+                    function msgPagadaContratista(){
+            const eg2 = String(c.egreso2||'').trim();
+            if(!eg2){
+              return (
+                '> Estado 5️⃣\n' +
+                'Estimado(a) *'+(c.nombre||'')+'*\n\n' +
+                '¡Con fecha: *'+(c.fechaEgreso||'')+'*, ha sido emitado el Egreso *N° '+(c.egreso||'')+'* para tu *Cuenta N° '+(c.informe||'')+'*!\n' +
+                'Si después de 3 días hábiles no has recibido tus honorarios, toma la opción *SOLICITUD TESORERÍA* desde la App para brindarte información.\n\n' +
+                'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes'
+              );
+            }
             return (
               '> Estado 5️⃣\n' +
               'Estimado(a) *'+(c.nombre||'')+'*\n\n' +
-              '¡Con fecha: *'+(c.fechaEgreso||'')+'*, ha sido emitado el Egreso *N° '+(c.egreso||'')+'* para tu *Cuenta N° '+(c.informe||'')+'*!\n' +
+              '¡Con fecha: *'+(c.fechaEgreso||'')+'*, han sido emitados los Egresos *N° '+(c.egreso||'')+'* y *N° '+(eg2||'')+'* para tu *Cuenta N° '+(c.informe||'')+'*!\n' +
               'Si después de 3 días hábiles no has recibido tus honorarios, toma la opción *SOLICITUD TESORERÍA* desde la App para brindarte información.\n\n' +
               'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes'
             );
@@ -1426,6 +1540,14 @@ function pintarCuentas(list){
       div.appendChild(inpBanco);
       div.appendChild(labelNum);
       div.appendChild(inpNum);
+      div.appendChild(labelPago2);
+      div.appendChild(inpPago2);
+      div.appendChild(labelDest2);
+      div.appendChild(selDest2);
+      div.appendChild(labelBanco2);
+      div.appendChild(inpBanco2);
+      div.appendChild(labelNum2);
+      div.appendChild(inpNum2);
       div.appendChild(btnRow);
     }
 
