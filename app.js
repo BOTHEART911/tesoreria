@@ -1040,6 +1040,8 @@ function pintarCuentas(list){
                 'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes'
               );
             }
+        } 
+          
           if(telContratista){
             sendBuilderbotMessage(telContratista, msgPagadaContratista());
           }
