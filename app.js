@@ -532,13 +532,29 @@ async function cargarCuentasPorEstado(){
     const list=await apiGet('listCuentasPendientes', { estado: REVISION_MODE });
     CUENTAS_DATA=Array.isArray(list)?list:[];
 
-    // Priorizar a OSCAR MAURICIO POLANIA GUERRA en EGRESOS PENDIENTES y EGRESOS EMITIDOS
+  // Priorizar a OSCAR MAURICIO POLANIA GUERRA + ordenar por fecha (más antigua primero)
     if (REVISION_MODE === 'ORDEN DE PAGO' || REVISION_MODE === 'EGRESO'){
       const PRIORITARIO = 'OSCAR MAURICIO POLANIA GUERRA';
+
+      // Fecha en formato DD/MM/YYYY o DD-MM-YYYY
+      const parseFechaDMY = (val) => {
+        const s = String(val || '').trim();
+        if (!s) return Infinity; // sin fecha -> al final del grupo
+        const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+        if (!m) return Infinity;
+        return new Date(+m[3], +m[2]-1, +m[1]).getTime();
+      };
+
+      // En EGRESOS PENDIENTES ordenar por FECHA DE ORDEN; en EGRESOS EMITIDOS por FECHA DE EGRESO
+      const campoFecha = (REVISION_MODE === 'ORDEN DE PAGO') ? 'fechaOrden' : 'fechaEgreso';
+
       CUENTAS_DATA.sort((a, b) => {
         const aPrio = String(a.nombre || '').trim().toUpperCase() === PRIORITARIO ? 0 : 1;
         const bPrio = String(b.nombre || '').trim().toUpperCase() === PRIORITARIO ? 0 : 1;
-        return aPrio - bPrio;
+        // 1) Oscar siempre arriba
+        if (aPrio !== bPrio) return aPrio - bPrio;
+        // 2) Dentro del mismo grupo: fecha ascendente (más antigua primero)
+        return parseFechaDMY(a[campoFecha]) - parseFechaDMY(b[campoFecha]);
       });
     }
 
