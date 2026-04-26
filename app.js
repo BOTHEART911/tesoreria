@@ -1033,21 +1033,13 @@ function pintarCuentas(list){
             const eg2 = String(c.egreso2||'').trim();
             if(!eg2){
               return (
-                '> Estado 5️⃣\n' +
+                '> Estado 5️⃣ - Fin de cuenta\n' +
                 'Estimado(a) *'+(c.nombre||'')+'*\n\n' +
-                '¡Con fecha: *'+(c.fechaEgreso||'')+'*, ha sido emitado el Egreso *N° '+(c.egreso||'')+'* para tu *Cuenta N° '+(c.informe||'')+'*!\n' +
+                '¡Con fecha: *'+(c.fechaEgreso||'')+'*, ha sido emitado el Egreso *N° '+(c.egreso||'')+'* para el pago de tu *Cuenta N° '+(c.informe||'')+'*!\n\n' +
                 'Si después de 3 días hábiles no has recibido tus honorarios, toma la opción *SOLICITUD TESORERÍA* desde la App para brindarte información.\n\n' +
                 'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes'
               );
             }
-            return (
-              '> Estado 5️⃣\n' +
-              'Estimado(a) *'+(c.nombre||'')+'*\n\n' +
-              '¡Con fecha: *'+(c.fechaEgreso||'')+'*, han sido emitados los Egresos *N° '+(c.egreso||'')+'* y *N° '+(eg2||'')+'* para tu *Cuenta N° '+(c.informe||'')+'*!\n' +
-              'Si después de 3 días hábiles no has recibido tus honorarios, toma la opción *SOLICITUD TESORERÍA* desde la App para brindarte información.\n\n' +
-              'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes'
-            );
-          }
           if(telContratista){
             sendBuilderbotMessage(telContratista, msgPagadaContratista());
           }
