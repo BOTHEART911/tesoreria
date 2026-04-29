@@ -439,18 +439,55 @@ function pintarContratistas(list){
     pTermino.textContent='FECHA TERMINO: '+(c.fechaTermino||'');
     div.appendChild(pTermino);
 
-    const btnRow=document.createElement('div');
-    btnRow.className='btn-row';
+    const actionsRow=document.createElement('div');
+actionsRow.className='contr-actions';
 
-    const btnDetalles=document.createElement('button');
-    btnDetalles.textContent='MOSTRAR DETALLES';
-    btnDetalles.addEventListener('click', ()=>{
-      playSoundOnce(SOUNDS.login);
-      mostrarDetallesContratista(c.documento);
-    });
+const leftGroup=document.createElement('div');
+leftGroup.className='left-group';
 
-    btnRow.appendChild(btnDetalles);
-    div.appendChild(btnRow);
+const rightGroup=document.createElement('div');
+rightGroup.className='right-group';
+
+const btnDetalles=document.createElement('button');
+btnDetalles.textContent='MOSTRAR DETALLES';
+btnDetalles.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.login);
+  mostrarDetallesContratista(c.documento);
+});
+
+const btnWhatsapp=document.createElement('button');
+btnWhatsapp.className='btn-icon';
+btnWhatsapp.innerHTML='<img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp" alt="WhatsApp">';
+btnWhatsapp.setAttribute('aria-label','Abrir chat de WhatsApp');
+btnWhatsapp.addEventListener('click', ()=>{
+  let tel=String(c.telefono||'').replace(/\D/g,'');
+  if(!tel){ Swal.fire({icon:'info',title:'Sin teléfono'}); return; }
+  if(!tel.startsWith('57')) tel='57'+tel;
+  if(!/^57\d{10}$/.test(tel)){
+    Swal.fire({icon:'warning',title:'Teléfono inválido'}); return;
+  }
+  window.open('https://wa.me/'+tel,'_blank');
+});
+
+const btnDrive=document.createElement('button');
+btnDrive.className='btn-icon';
+btnDrive.innerHTML='<img src="https://res.cloudinary.com/dqqeavica/image/upload/v1763997280/DRIVE_bycgsc.webp" alt="Drive">';
+btnDrive.setAttribute('aria-label','Abrir carpeta Drive');
+btnDrive.addEventListener('click', ()=>{
+  if(c.carpetaContratista){
+    window.open('https://drive.google.com/drive/folders/'+c.carpetaContratista,'_blank');
+  }else{
+    Swal.fire({icon:'info',title:'Sin carpeta',text:'No hay carpeta asociada.'});
+  }
+});
+
+leftGroup.appendChild(btnDetalles);
+rightGroup.appendChild(btnWhatsapp);
+rightGroup.appendChild(btnDrive);
+actionsRow.appendChild(leftGroup);
+actionsRow.appendChild(rightGroup);
+
+div.appendChild(actionsRow);
 
     wrap.appendChild(div);
   }
