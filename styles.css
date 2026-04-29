@@ -591,6 +591,46 @@ button:active {
 }
 
 /* ============================================================
+   FILA DE ACCIONES — TARJETA CONTRATISTA
+   ============================================================ */
+.contr-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.contr-actions .left-group {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+}
+
+.contr-actions .left-group button {
+  width: 100%;
+}
+
+.contr-actions .right-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Iconos más compactos dentro de la fila de acciones del contratista */
+.contr-actions .right-group .btn-icon img {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+@media (max-width: 700px) {
+  .contr-actions { flex-direction: row; }
+  .contr-actions .left-group { min-width: 0; }
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 700px) {
