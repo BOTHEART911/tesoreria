@@ -631,6 +631,20 @@ button:active {
 }
 
 /* ============================================================
+   FECHA RADICACIÓN — pulso rojo
+   ============================================================ */
+.pulse-red {
+  color: #dc2626;
+  font-weight: 900;
+  animation: pulseRed 1.05s ease-in-out infinite;
+}
+@keyframes pulseRed {
+  0%   { transform: scale(1);    text-shadow: 0 0 0 rgba(220,38,38,0.0); }
+  50%  { transform: scale(1.02); text-shadow: 0 0 10px rgba(220,38,38,0.35); }
+  100% { transform: scale(1);    text-shadow: 0 0 0 rgba(220,38,38,0.0); }
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 700px) {
