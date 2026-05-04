@@ -304,6 +304,20 @@ document.getElementById('go-cuentas-pagadas').addEventListener('click', async ()
   showView('view-revision');
 });
 
+document.getElementById('go-emision').addEventListener('click', async ()=>{
+  playSoundOnce(SOUNDS.login);
+  REVISION_MODE = 'EMISION';
+  document.getElementById('revision-title').textContent = 'EMISIÓN - PRE-ORDENES PENDIENTES';
+  document.getElementById('revision-caption').textContent = 'N° de Pre-Ordenes Pendientes';
+  await cargarCuentasPorEstado();
+  if (!CUENTAS_DATA || CUENTAS_DATA.length === 0){
+    await Swal.fire({ icon:'success', title:'¡Sin pendientes!', text:'No hay PRE-ORDENES pendientes por emitir.', timer: 3200, showConfirmButton:false });
+    showView('view-inicio');
+    return;
+  }
+  showView('view-revision');
+});
+
   /* ================== MIS INFORMES ================== */
 const INFORMES_LINKS = {
   'DEYSI PATRICIA GONZALEZ GUERRA': 'https://docs.google.com/spreadsheets/d/1Fkc12KgVJAvu9zvwNtlg-KH876lizXV5Mde9FTSIV1Q/edit?usp=sharing',
@@ -566,12 +580,13 @@ document.getElementById('detalles-ocultar').addEventListener('click', ()=>{
 let CUENTAS_DATA=[];
 async function cargarCuentasPorEstado(){
   try{
-    const list=await apiGet('listCuentasPendientes', { estado: REVISION_MODE });
+    const estadoQuery = (REVISION_MODE === 'EMISION') ? 'PRE-ORDEN' : REVISION_MODE;
+const list=await apiGet('listCuentasPendientes', { estado: estadoQuery });
     CUENTAS_DATA=Array.isArray(list)?list:[];
 
   // Priorizar a OSCAR MAURICIO POLANIA GUERRA + ordenar por fecha (más antigua primero)
-    if (REVISION_MODE === 'ORDEN DE PAGO' || REVISION_MODE === 'EGRESO'){
-      const PRIORITARIO = 'OSCAR MAURICIO POLANIA GUERRA';
+    if (REVISION_MODE === 'ORDEN DE PAGO' || REVISION_MODE === 'EGRESO' || REVISION_MODE === 'EMISION'){
+  const PRIORITARIO = 'OSCAR MAURICIO POLANIA GUERRA';
 
       // Fecha en formato DD/MM/YYYY o DD-MM-YYYY
       const parseFechaDMY = (val) => {
@@ -583,7 +598,9 @@ async function cargarCuentasPorEstado(){
       };
 
       // En EGRESOS PENDIENTES ordenar por FECHA DE ORDEN; en EGRESOS EMITIDOS por FECHA DE EGRESO
-      const campoFecha = (REVISION_MODE === 'ORDEN DE PAGO') ? 'fechaOrden' : 'fechaEgreso';
+      const campoFecha = (REVISION_MODE === 'ORDEN DE PAGO') ? 'fechaOrden'
+                   : (REVISION_MODE === 'EMISION') ? 'fechaRadicacion'
+                   : 'fechaEgreso';
 
       CUENTAS_DATA.sort((a, b) => {
         const aPrio = String(a.nombre || '').trim().toUpperCase() === PRIORITARIO ? 0 : 1;
@@ -853,6 +870,50 @@ function pintarCuentas(list){
       div.appendChild(btnRow);
     }
 
+    if (REVISION_MODE === 'EMISION'){
+  const facturaVal = String(c.facturaElectronica||'').trim();
+  const pFactura=document.createElement('p');
+  pFactura.className='item-sub';
+  pFactura.textContent='FACTURA ELECTRÓNICA N°: '+(facturaVal ? facturaVal : 'N/A');
+
+  const pSup=document.createElement('p');
+  pSup.className='item-sub';
+  pSup.textContent='SUPERVISOR: '+(c.supervisorCuenta||'');
+
+  const pOrden2=document.createElement('p');
+  pOrden2.className='item-sub';
+  pOrden2.textContent='N° DE ORDEN: '+(c.orden||'');
+
+  const pFechaOrden=document.createElement('p');
+  pFechaOrden.className='item-sub';
+  pFechaOrden.textContent='FECHA DE ORDEN: '+(c.fechaOrden||'');
+
+  // FECHA DE RADICACIÓN con pulso rojo
+  const pRad=document.createElement('p');
+  pRad.className='item-sub pulse-red';
+  pRad.textContent='FECHA DE RADICACIÓN: '+(c.fechaRadicacion||'');
+
+  div.appendChild(pFactura);
+  div.appendChild(pSup);
+  div.appendChild(pOrden2);
+  div.appendChild(pFechaOrden);
+  div.appendChild(pRad);
+
+  const btnRow=document.createElement('div');
+  btnRow.className='btn-row';
+
+  const btnEmitir=document.createElement('button');
+  btnEmitir.className='btn-primary';
+  btnEmitir.textContent='EMITIR';
+  btnEmitir.addEventListener('click', async ()=>{
+    playSoundOnce(SOUNDS.login);
+    await emitirOrdenPagoFlow(c);
+  });
+  btnRow.appendChild(btnEmitir);
+
+  div.appendChild(btnRow);
+}
+
     if (REVISION_MODE === 'EGRESO'){
       // mostrar fecha/egreso
       const pFecha=document.createElement('p');
@@ -1072,7 +1133,7 @@ function pintarCuentas(list){
               return (
                 '> Estado 5️⃣ - Final de Cuenta\n' +
                 'Estimado(a) *'+(c.nombre||'')+'*\n\n' +
-                '¡Con fecha: *'+(c.fechaEgreso||'')+'*, ha sido emitado el Egreso *N° '+(c.egreso||'')+'* para el pago de tu *Cuenta N° '+(c.informe||'')+'* el día de hoy!\n\n' +
+                '¡Con fecha: *'+(c.fechaEgreso||'')+'*, ha sido emitado el Egreso *N° '+(c.egreso||'')+'* para el *pago de tu Cuenta N° '+(c.informe||'')+' el día de hoy*!\n\n' +
                 '> Si después de 3 días hábiles no has recibido tus honorarios, toma la opción *SOLICITUD TESORERÍA* desde la App para brindarte información.\n\n' +
                 'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes'
               );
@@ -1080,7 +1141,7 @@ function pintarCuentas(list){
             return (
               '> Estado 5️⃣ - Final de Cuenta\n' +
               'Estimado(a) *'+(c.nombre||'')+'*\n\n' +
-              '¡Con fecha: *'+(c.fechaEgreso||'')+'*, han sido emitados los Egresos *N° '+(c.egreso||'')+'* y *N° '+(eg2||'')+'* para el pago de tu *Cuenta N° '+(c.informe||'')+'* el día de hoy!\n\n' +
+              '¡Con fecha: *'+(c.fechaEgreso||'')+'*, han sido emitados los Egresos *N° '+(c.egreso||'')+'* y *N° '+(eg2||'')+'* para el *pago de tu Cuenta N° '+(c.informe||'')+' el día de hoy*!\n\n' +
               '> Si después de 3 días hábiles no has recibido tus honorarios, toma la opción *SOLICITUD TESORERÍA* desde la App para brindarte información.\n\n' +
               'Cordialmente,\n\n*Equipo de Tesorería*\n> Alcaldía de Flandes'
             );
@@ -1165,6 +1226,67 @@ document.getElementById('revision-volver').addEventListener('click', ()=>{
   document.getElementById('revision-caption').textContent = '';
   showView('view-inicio');
 });
+
+/* ================== EMITIR ORDEN DE PAGO ================== */
+async function emitirOrdenPagoFlow(c){
+  const documento = c.documento;
+  const nombre = c.nombre || '';
+  const informe = c.informe || '';
+
+  const telContratistaRaw = c.telefono || '';
+  const telContratista = normalizeContratistaNumber(telContratistaRaw);
+
+  const TESORERIA_GROUP_ID = 'KQyQKkptgOI56Qbn6gsJUh'; /* Grupo de tesorería */
+
+  const rs = await Swal.fire({
+    icon:'success',
+    title:`Pre-Orden N° ${informe} de ${nombre}`,
+    text:'¿Deseas EMITIR la Orden de Pago?',
+    showCancelButton:true,
+    confirmButtonText:'EMITIR',
+    cancelButtonText:'Cancelar'
+  });
+
+  function msgOrdenPagoContratista(){
+    return (
+      '> Estado 4️⃣\n' +
+      'Estimado(a) *'+nombre+'*\n\n' +
+      '¡Ha sido emitada la orden de pago de tu *Cuenta N° '+informe+'*\n' +
+      'El equipo de *Tesoría* en sus tiempos, revisará para generar el Egreso y Pago de tus honorarios.\n\n' +
+      'Cordialmente,\n\n*Equipo de Contabilidad*\n> Alcaldía de Flandes'
+    );
+  }
+
+  function msgOrdenPagoTesoreria(){
+    return (
+      'Estimado Equipo de Tesorería\n\n' +
+      'Se ha generado la *Orden de Pago* de la *Cuenta N° '+informe+'* del contratista *'+nombre+'*\n\n' +
+      'Por favor revisar para generar Egreso.\n\n' +
+      'Cordialmente,\n\n*Equipo de Contabilidad*'
+    );
+  }
+
+  if(!rs.isConfirmed) return;
+
+  try{
+    await apiPost('emitirOrdenPagoV2', {
+      documento,
+      informe,
+      responsable: currentUser?.profesional || ''
+    });
+
+    if(telContratista){
+      sendBuilderbotMessage(telContratista, msgOrdenPagoContratista());
+    }
+    sendBuilderbotMessage(TESORERIA_GROUP_ID, msgOrdenPagoTesoreria());
+
+    Swal.fire({icon:'success',title:'Orden de Pago Emitida',timer:1800,showConfirmButton:false});
+    await cargarCuentasPorEstado();
+    showView('view-revision');
+  }catch(e){
+    Swal.fire({icon:'error',title:'Error',text:e.message});
+  }
+}
 
 /* ================== COMUNICADOS ================== */
 document.getElementById('comunicado-enviar').addEventListener('click',async()=>{
