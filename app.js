@@ -790,12 +790,29 @@ function pintarCuentas(list){
       const eg2_6 = eg2Full.startsWith('2026') ? eg2Full.slice(4) : eg2Full;
       inpEgreso2.value = eg2_6;
 
-      inpEgreso2.addEventListener('input', ()=>{
+     inpEgreso2.addEventListener('input', ()=>{
         let v=String(inpEgreso2.value||'').replace(/\D/g,'').slice(0,6);
         inpEgreso2.value=v;
         c.egreso2_6=v;
       });
 
+      // ===== CHECKBOX: Marcar Cuenta Pagada (solo cuentas atrasadas) =====
+      const wrapMarcarPagada = document.createElement('div');
+      wrapMarcarPagada.style.cssText = 'display:flex; align-items:flex-start; gap:10px; margin-top:14px; padding:10px 12px; background:rgba(220,38,38,.06); border:1.5px solid rgba(220,38,38,.28); border-radius:14px;';
+
+      const chkMarcarPagada = document.createElement('input');
+      chkMarcarPagada.type = 'checkbox';
+      chkMarcarPagada.id = 'chk-marcar-pagada-' + (c.documento||'') + '-' + (c.informe||'');
+      chkMarcarPagada.style.cssText = 'width:20px; height:20px; margin:0; flex-shrink:0; accent-color:#dc2626; cursor:pointer;';
+
+      const lblMarcarPagada = document.createElement('label');
+      lblMarcarPagada.setAttribute('for', chkMarcarPagada.id);
+      lblMarcarPagada.style.cssText = 'margin:0; padding:0; cursor:pointer; text-transform:none; letter-spacing:0; color:#111; font-size:.85rem; line-height:1.3;';
+      lblMarcarPagada.innerHTML = '<b style="color:#dc2626;">Marcar Cuenta Pagada</b><br><small style="color:#666;">Solo para casos de cuentas atrasadas.</small>';
+
+      wrapMarcarPagada.appendChild(chkMarcarPagada);
+      wrapMarcarPagada.appendChild(lblMarcarPagada);
+      // ===== FIN CHECKBOX =====
 
       // botón guardar
       const btnRow=document.createElement('div');
@@ -826,12 +843,19 @@ function pintarCuentas(list){
         }
         const egreso2Full = egreso2_6 ? ('2026' + egreso2_6) : '';
 
+        // NUEVO: flag de marcar como pagada
+        const marcarPagada = chkMarcarPagada.checked === true;
+
         const rs = await Swal.fire({
-          icon:'success',
-          title:`Cuenta N° ${c.informe} de ${c.nombre}`,
-          text:'¿Deseas registrar EGRESO?',
+          icon: marcarPagada ? 'warning' : 'success',
+          title: marcarPagada
+            ? `¿Guardar Cuenta N° ${c.informe} como PAGADA?`
+            : `Cuenta N° ${c.informe} de ${c.nombre}`,
+          html: marcarPagada
+            ? `<b>${c.nombre || ''}</b><br><br>Esta cuenta pasará directamente a <b style="color:#dc2626;">PAGADA</b> sin notificar al contratista.<br><br><small style="color:#dc2626;"><b>Recuerda:</b> Esta opción es solo para casos de <b>cuentas atrasadas</b>.</small>`
+            : '¿Deseas registrar EGRESO?',
           showCancelButton:true,
-          confirmButtonText:'GUARDAR',
+          confirmButtonText: marcarPagada ? 'SÍ, MARCAR PAGADA' : 'GUARDAR',
           cancelButtonText:'Cancelar'
         });
         if(!rs.isConfirmed) return;
@@ -848,17 +872,23 @@ function pintarCuentas(list){
             contrato: c.contrato || '',
             nombre: c.nombre || '',
             orden: c.orden || '',
-            fechaOrden: c.fechaOrden || ''
+            fechaOrden: c.fechaOrden || '',
+            marcarPagada: marcarPagada // NUEVO
           });
 
-          Swal.fire({icon:'success',title:'Egreso guardado',timer:1800,showConfirmButton:false});
+          Swal.fire({
+            icon:'success',
+            title: marcarPagada ? 'Cuenta marcada como PAGADA' : 'Egreso guardado',
+            timer:1800,
+            showConfirmButton:false
+          });
           await cargarCuentasPorEstado();
           showView('view-revision');
         }catch(e){
           Swal.fire({icon:'error',title:'Error',text:e.message});
         }
       });
-
+      
       btnRow.appendChild(btnGuardar);
 
       div.appendChild(labelFecha);
@@ -867,6 +897,7 @@ function pintarCuentas(list){
       div.appendChild(inpEgreso);
       div.appendChild(labelEgreso2);
       div.appendChild(inpEgreso2);
+      div.appendChild(wrapMarcarPagada);
       div.appendChild(btnRow);
     }
 
