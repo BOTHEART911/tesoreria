@@ -655,8 +655,16 @@ const DESTINACIONES = [
   { name:'IMPUESTO AL CONSUMO DE TABACO Y CIGARRILLO (INDEPORTES)', banco:'OCCIDENTE', numCuenta:'103859393' },
   { name:'ESTAMPILLA ADULTO MAYOR 24%', banco:'DAVIVIENDA', numCuenta:'356000137089' },
   { name:'ESTAMPILLAS JUSTICIA FAMILIAR', banco:'DAVIVIENDA', numCuenta:'356070336322' },
-  { name:'ADMON CEMENTARIO', banco:'DAVIVIENDA', numCuenta:'356000133997' }
+  { name:'ADMON CEMENTARIO', banco:'DAVIVIENDA', numCuenta:'356000133997' },
+  { name:'ASIGNACION A LA INVERSION LOCAL', banco:'SISTEMA GENERAL DE REGALIAS', numCuenta:'133702' },
+  { name:'SITUACIÓN DE FONDOS', banco:'SISTEMA GENERAL DE REGALIAS', numCuenta:'133702' }
 ];
+
+/* Destinaciones que permiten guardar VALOR PAGADO = 0 (Sistema General de Regalías) */
+function destinoPermiteCero(nombreDestino){
+  const n = String(nombreDestino||'').trim().toUpperCase();
+  return n === 'ASIGNACION A LA INVERSION LOCAL' || n === 'SITUACIÓN DE FONDOS';
+}
 
 function pintarCuentas(list){
   const wrap=document.getElementById('cuentas-list');
@@ -1077,14 +1085,15 @@ function pintarCuentas(list){
       btnGuardar.addEventListener('click', async ()=>{
         playSoundOnce(SOUNDS.login);
 
-        const pagoNum = parseCOPNumber(inpPago.value);
-        if(!pagoNum || pagoNum<=0){
-          Swal.fire({icon:'warning',title:'VALOR PAGADO requerido',text:'Ingresa un valor válido en pesos colombianos.'});
-          return;
-        }
-        const destinacion = String(selDest.value||'').trim();
+       const destinacion = String(selDest.value||'').trim();
         if(!destinacion){
           Swal.fire({icon:'warning',title:'FUENTE DE DESTINACIÓN requerida',text:'Selecciona una opción.'});
+          return;
+        }
+        const permiteCero1 = destinoPermiteCero(destinacion);
+        const pagoNum = parseCOPNumber(inpPago.value);
+        if(!permiteCero1 && (!pagoNum || pagoNum<=0)){
+          Swal.fire({icon:'warning',title:'VALOR PAGADO requerido',text:'Ingresa un valor válido en pesos colombianos.'});
           return;
         }
         const banco = String(inpBanco.value||'').trim();
@@ -1099,16 +1108,17 @@ function pintarCuentas(list){
         const banco2 = String(inpBanco2.value||'').trim();
         const numCuenta2 = String(inpNum2.value||'').trim();
 
-        const hasPago2 = pagoNum2 && pagoNum2 > 0;
+        const permiteCero2 = destinoPermiteCero(destinacion2);
+        const hasPago2 = (pagoNum2 && pagoNum2 > 0) || (permiteCero2 && !!destinacion2);
         const hasAny2 = hasPago2 || !!destinacion2 || !!banco2 || !!numCuenta2;
 
         if (hasAny2){
-          if (!hasPago2){
-            Swal.fire({icon:'warning',title:'VALOR PAGADO 2 inválido',text:'Si vas a diligenciar el bloque 2, ingresa un valor válido.'});
-            return;
-          }
           if (!destinacion2){
             Swal.fire({icon:'warning',title:'FUENTE DE DESTINACIÓN 2 requerida',text:'Selecciona una opción o deja todo el bloque 2 vacío.'});
+            return;
+          }
+          if (!permiteCero2 && !(pagoNum2 && pagoNum2 > 0)){
+            Swal.fire({icon:'warning',title:'VALOR PAGADO 2 inválido',text:'Si vas a diligenciar el bloque 2, ingresa un valor válido.'});
             return;
           }
           if (!banco2 || !numCuenta2){
